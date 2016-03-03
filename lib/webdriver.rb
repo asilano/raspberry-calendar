@@ -7,18 +7,8 @@ class Webdriver
     @refresh_interval = config['refresh_interval'] || '1m'
     @cookie_file = cookie_file
     @current_url = @base_url
-    @browser = Watir::Browser.new
 
-    # Maximise and lose chrome
-    @browser.send_keys :f11
-
-    # Navigate to calendar, ready to load cookies
-    @browser.goto @current_url
-    Watir::Wait.until { @browser.body.visible? }
-
-    # Load the cookies for the domain, then refresh
-    @browser.cookies.load(@cookie_file)
-    @browser.goto @current_url
+    spawn_browser
 
     # Create a scheduled job to kick an update every minute
     @scheduler = Rufus::Scheduler.new
@@ -33,8 +23,32 @@ class Webdriver
   end
 
 private
+  def spawn_browser
+    if @browser
+      begin
+        @browser.close
+      rescue
+      end
+    end
+
+    @browser = Watir::Browser.new
+
+    # Maximise and lose chrome
+    @browser.send_keys :f11
+
+    # Navigate to calendar, ready to load cookies
+    @browser.goto @current_url
+    Watir::Wait.until { @browser.body.visible? }
+
+    # Load the cookies for the domain, then refresh
+    @browser.cookies.load(@cookie_file)
+    @browser.goto @current_url
+  end
+
   def refresh
     @browser.goto @current_url
+  rescue
+    spawn_browser
   end
 
   def store_cookies
