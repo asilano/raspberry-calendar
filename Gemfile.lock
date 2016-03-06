@@ -9,11 +9,14 @@ GEM
       tzinfo (~> 1.1)
     childprocess (0.5.9)
       ffi (~> 1.0, >= 1.0.11)
+    deordinalize (0.0.3)
     ffi (1.9.10-x86-mingw32)
     i18n (0.7.0)
     json (1.8.3)
     minitest (5.8.4)
     multi_json (1.11.2)
+    numbers_in_words (0.4.0)
+      activesupport
     rubyzip (1.2.0)
     rufus-scheduler (3.2.0)
     selenium-webdriver (2.52.0)
@@ -33,5 +36,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  deordinalize
+  numbers_in_words
   rufus-scheduler
   watir-webdriver

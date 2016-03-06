@@ -5,6 +5,7 @@ class Webdriver
   def initialize(config, cookie_file)
     @base_url = config['base_url']
     @refresh_interval = config['refresh_interval'] || '1m'
+    @reset_interval = config['reset_to_base_timeout'] || '10m'
     @cookie_file = cookie_file
     @current_url = @base_url
 
@@ -20,6 +21,28 @@ class Webdriver
     @scheduler.every '1h' do
       store_cookies
     end
+  end
+
+  def show(params)
+    @scheduler.pause
+    @current_url = @base_url + params
+    refresh
+    Watir::Wait.until { @browser.body.visible? }
+
+    # Schedule a reset-to-base
+    if @reset_job
+      @reset_job.unschedule
+    end
+    @reset_job = @scheduler.schedule_in @reset_interval do
+      @current_url = @base_url
+      puts "  Resetting to base..."
+    end
+
+    @scheduler.resume
+  end
+
+  def reset
+    spawn_browser
   end
 
 private
